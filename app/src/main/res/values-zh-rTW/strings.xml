@@ -96,12 +96,14 @@
     <string name="error_field_invalid_or_unsupported_thread_link_or_id">無效的、或者是並不支持的帖子鏈接/ID格式</string>
     <string name="error_field_invalid_or_unsupported_word">無效的、或者是並不支持的屏蔽詞格式</string>
         
-    <string name="message_thread_link_copy">帖子的鏈接已復製到剪切板</string>
+    <string name="message_link_copied">鏈接已復製到剪切板</string>
         
     <string name="prompt_reply">寫點內容吧…</string>
         
     <string name="signature">—— 來自 &lt;a href=\"%1$s\">鵝球&lt;/a> v%2$s</string>
+    <string name="signature_with_device_info">—— 來自 %1$s, &lt;a href="%2$s">鵝球&lt;/a> v%3$s</string>
     <string name="signature_in_reply">—— 來自 [url=%1$s]鵝球[/url] v%2$s</string>
+    <string name="signature_in_reply_with_device_info">—— 來自 %1$s, [url=%2$s]鵝球[/url] v%3$s</string>
         
     <string name="dialog_progress_message_reply">回復中…</string>
         
@@ -440,4 +442,5 @@
     <string name="stop">停止</string>
     <string name="menu_prefetch_after_posts">預加載本頁之後</string>
     <string name="menu_refresh_avatar">刷新頭像</string>
+    <string name="menu_copy_link">複製鏈接</string>
 </resources>

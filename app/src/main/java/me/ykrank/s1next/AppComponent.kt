@@ -66,6 +66,7 @@ import me.ykrank.s1next.view.page.post.postedit.BasePostEditFragment
 import me.ykrank.s1next.view.page.post.postedit.NewThreadFragment
 import me.ykrank.s1next.view.page.post.postedit.ReplyFragment
 import me.ykrank.s1next.view.page.post.postedit.toolstab.ImageUploadFragment
+import me.ykrank.s1next.view.page.post.postedit.toolstab.emoticon.EmotionFragment
 import me.ykrank.s1next.view.page.post.postlist.PostListActivity
 import me.ykrank.s1next.view.page.post.postlist.PostListFragment
 import me.ykrank.s1next.view.page.post.postlist.PostListGatewayActivity
@@ -194,5 +195,5 @@ interface AppComponent {
     fun inject(fragment: BaseLoginFragment)
     fun inject(fragment: SAFFragment)
     fun inject(fragment: ThreadPrefetchDialogFragment)
-
+    fun inject(fragment: EmotionFragment)
 }

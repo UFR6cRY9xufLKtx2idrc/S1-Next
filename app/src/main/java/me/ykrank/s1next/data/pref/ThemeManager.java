@@ -3,10 +3,6 @@ package me.ykrank.s1next.data.pref;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
-import androidx.annotation.ColorInt;
-import androidx.annotation.IntDef;
-import androidx.annotation.StyleRes;
-import androidx.core.graphics.ColorUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
@@ -17,6 +13,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
 import java.util.List;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.IntDef;
+import androidx.annotation.StyleRes;
+import androidx.core.graphics.ColorUtils;
 import me.ykrank.s1next.R;
 
 /**
@@ -27,9 +27,12 @@ public final class ThemeManager {
     public static final int TRANSLUCENT_THEME_DARK = R.style.Theme_Translucent_Dark;
 
     /**
-     * Default theme in AndroidManifest.xml is light theme.
+     * Default theme in AndroidManifest.xml is {@link R.style#Theme_DayNight}.
+     * In Light mode, it points to {@link R.style#Theme_Light_AfternoonTea},
+     * In Dark mode, it points to {@link R.style#Theme_Dark}
      */
     private static final Theme DEFAULT_THEME = Theme.AFTERNOON_TEA;
+    private static final Theme DEFAULT_DARK_THEME = Theme.DARK_THEME;
 
     /**
      * https://www.google.com/design/spec/style/color.html#color-ui-color-application
@@ -52,8 +55,7 @@ public final class ThemeManager {
         public Theme get() {
             Theme theme;
 
-            int currentNightMode = mContext.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-            if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
+            if (isNightMode()) {
                 theme = Theme.VALUES.get(mGeneralPreferencesProvider.getDarkThemeIndex());
             } else {
                 theme = Theme.VALUES.get(mGeneralPreferencesProvider.getThemeIndex());
@@ -68,6 +70,10 @@ public final class ThemeManager {
     public ThemeManager(Context context, GeneralPreferences generalPreferencesProvider) {
         this.mContext = context;
         this.mGeneralPreferencesProvider = generalPreferencesProvider;
+    }
+
+    public boolean isNightMode() {
+        return (mContext.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
     }
 
     /**
@@ -111,7 +117,7 @@ public final class ThemeManager {
     }
 
     public boolean isDefaultTheme() {
-        return getTheme() == DEFAULT_THEME;
+        return getTheme() == (isNightMode() ? DEFAULT_DARK_THEME : DEFAULT_THEME);
     }
 
     public boolean isDarkTheme() {

@@ -92,6 +92,12 @@ abstract class BaseActivity : LibBaseActivity() {
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (savedInstanceState != null) {
+            val prevNightMode = savedInstanceState.getBoolean(STATE_NIGHT_MODE)
+            if (prevNightMode != mThemeManager.isNightMode) {
+                mThemeManager.invalidateTheme()
+            }
+        }
         // change the theme depends on preference
         if (!mThemeManager.isDefaultTheme) {
             if (isTranslucent) {
@@ -114,6 +120,11 @@ abstract class BaseActivity : LibBaseActivity() {
             mEventBus.getClsFlow<NoticeRefreshEvent>(NoticeRefreshEvent::class.java)
                 .collect { event -> refreshNoticeMenuItem(event.isNewPm, event.isNewNotice) }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(STATE_NIGHT_MODE, mThemeManager.isNightMode)
     }
 
     override fun setTitle(title: CharSequence?) {
@@ -287,6 +298,7 @@ abstract class BaseActivity : LibBaseActivity() {
     }
 
     companion object {
+        const val STATE_NIGHT_MODE = "state_night_mode"
 
         val EXTRA_MESSAGE = "message"
 

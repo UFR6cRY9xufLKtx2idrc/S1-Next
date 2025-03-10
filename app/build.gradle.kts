@@ -17,8 +17,8 @@ val mKeyPassword: String? = properties.getProperty("keyPassword")
 val httpDnsId = properties.getProperty("httpDnsId") ?: "\"\""
 val httpDnsSecret = properties.getProperty("httpDnsSecret") ?: "\"\""
 
-val appVersionCode = 95
-val appVersionName = "3.3"
+val appVersionCode = 98
+val appVersionName = "3.4"
 val appVersionSuffix = ""
 
 android {
@@ -147,6 +147,7 @@ dependencies {
 
     implementation(libs.okhttp.urlconnection)
     implementation(libs.okhttp.coroutines)
+    implementation(libs.okhttp)
     implementation(libs.retrofit2)
     implementation(libs.retrofit2.adapter.rxjava2)
     implementation(libs.retrofit2.converter.jackson)

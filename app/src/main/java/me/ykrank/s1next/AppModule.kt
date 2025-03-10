@@ -24,6 +24,7 @@ import me.ykrank.s1next.data.pref.DownloadPreferencesManager
 import me.ykrank.s1next.data.pref.NetworkPreferencesManager
 import me.ykrank.s1next.task.AutoSignTask
 import me.ykrank.s1next.viewmodel.UserViewModel
+import me.ykrank.s1next.widget.EmoticonFactory
 import me.ykrank.s1next.widget.RawJsonConverterFactory
 import me.ykrank.s1next.widget.download.DownloadProgressInterceptor
 import me.ykrank.s1next.widget.download.ProgressManager
@@ -221,5 +222,11 @@ class AppModule {
     @AppLife
     fun provideProgressManager(): ProgressManager {
         return ProgressManager()
+    }
+
+    @Provides
+    @AppLife
+    fun provideEmoticonFactory(context: Context): EmoticonFactory {
+        return EmoticonFactory(context)
     }
 }

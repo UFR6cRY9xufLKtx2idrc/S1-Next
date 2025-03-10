@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="Theme.DayNight" parent="Theme.Light.AfternoonTea"/>
 
     <style name="Theme.Light.AfternoonTea" parent="Lib.Theme.Light.AfternoonTea" />
 

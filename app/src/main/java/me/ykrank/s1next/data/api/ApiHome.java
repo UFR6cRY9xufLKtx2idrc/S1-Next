@@ -24,22 +24,22 @@ public class ApiHome {
 
     //Profile
     static final String URL_PROFILE = Api.BASE_API_PREFIX + "profile";
-    static final String URL_PROFILE_WEB = Api.BASE_URL + "home.php?mod=space&do=profile&from=space";
+    static final String URL_PROFILE_WEB = "home.php?mod=space&do=profile&from=space";
 
     //Friends
     static final String URL_FRIENDS = Api.BASE_API_PREFIX + "friend";
 
     //Threads
-    static final String URL_THREADS = Api.BASE_URL + "home.php?mod=space&do=thread&from=space&type=thread&view=me";
+    static final String URL_THREADS = "home.php?mod=space&do=thread&from=space&type=thread&view=me";
 
     //Replies
-    static final String URL_REPLIES = Api.BASE_URL + "home.php?mod=space&do=thread&from=space&type=reply&view=me";
+    static final String URL_REPLIES = "home.php?mod=space&do=thread&from=space&type=reply&view=me";
 
     //Rate
-    static final String URL_RATE_PRE = Api.BASE_URL + "forum.php?mod=misc&action=rate&infloat=yes&handlekey=rate&inajax=1&ajaxtarget=fwin_content_rate";
-    static final String URL_RATE = Api.BASE_URL + "forum.php?mod=misc&action=rate&ratesubmit=yes&infloat=yes&inajax=1";
+    static final String URL_RATE_PRE = "forum.php?mod=misc&action=rate&infloat=yes&handlekey=rate&inajax=1&ajaxtarget=fwin_content_rate";
+    static final String URL_RATE = "forum.php?mod=misc&action=rate&ratesubmit=yes&infloat=yes&inajax=1";
 
     //Report
-    static final String URL_REPORT_PRE = Api.BASE_URL + "misc.php?mod=report&rtype=post&rid=41759641&tid=1793919&t=1543462376208&inajax=1";
-    static final String URL_REPORT = Api.BASE_URL + "misc.php?mod=report&inajax=1";
+    static final String URL_REPORT_PRE = "misc.php?mod=report&rtype=post&rid=41759641&tid=1793919&t=1543462376208&inajax=1";
+    static final String URL_REPORT = "misc.php?mod=report&inajax=1";
 }

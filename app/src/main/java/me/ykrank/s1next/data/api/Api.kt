@@ -6,18 +6,15 @@ import android.webkit.URLUtil
 import okhttp3.HttpUrl
 
 object Api {
-    const val BASE_HOST = "bbs.saraba1st.com"
-    const val BASE_URL = "https://$BASE_HOST/2b/"
-    private const val BASE_AVATAR_URL = "https://avatar.saraba1st.com/"
-    const val BASE_API_URL = "https://$BASE_HOST/2b/api/mobile/"
-    private const val BASE_STATIC_URL = "https://static.saraba1st.com/"
-    private const val BASE_STATIC_URL_HTTP = "http://static.saraba1st.com/"
-    val HOST_LIST = arrayOf(
-        "bbs.saraba1st.com", "www.saraba1st.com", "stage1st.com", "www.stage1st.com"
-    )
+    val baseApi = BaseApi.DEFAULT
+    val BASE_URL = baseApi.baseUrl
+    private val BASE_AVATAR_URL = baseApi.avatarUrl
+    private val BASE_STATIC_URL = baseApi.staticUrl
+    private val BASE_STATIC_URL_HTTP = baseApi.staticUrlHttp
+    val HOST_LIST = BaseApi.HOST_LIST
     var SUPPORT_HTTPS = true
-    private const val RANDOM_IMAGE_URL = "https://ac.stage3rd.com/S1_ACG_randpic.asp"
-    const val BASE_API_PREFIX = "index.php?module="
+    private val RANDOM_IMAGE_URL = BaseApi.RANDOM_IMAGE_URL
+    const val BASE_API_PREFIX = "api/mobile/index.php?module="
     const val API_VERSION_DEFAULT = "1"
     const val THREADS_PER_PAGE = 50
     const val POSTS_PER_PAGE = 40
@@ -34,13 +31,13 @@ object Api {
      * Opens the browser via [android.content.Intent].
      */
     val URL_BROWSER_REGISTER = prepend("member.php?mod=register")
-    private const val URL_USER_AVATAR_BIG = "${BASE_AVATAR_URL}%s_avatar_big.jpg"
+    private val URL_USER_AVATAR_BIG = "${BASE_AVATAR_URL}%s_avatar_big.jpg"
     private val URL_BROWSER_FAVOURITES = prepend("home.php?mod=space&do=favorite")
     private val URL_BROWSER_THREAD_LIST = prepend("forum-%s-%d.html")
     private val URL_BROWSER_POST_LIST = prepend("thread-%s-%d-1.html")
     val URL_VIEW_VOTE = prepend("forum.php?mod=misc&action=viewvote")
-    const val URL_DARK_ROOM = BASE_URL + "forum.php?mod=misc&action=showdarkroom&ajaxdata=json"
-    const val URL_WEB_BLACK_LIST = BASE_URL + "home.php?mod=space&do=friend&view=blacklist"
+    const val URL_DARK_ROOM = "forum.php?mod=misc&action=showdarkroom&ajaxdata=json"
+    const val URL_WEB_BLACK_LIST = "home.php?mod=space&do=friend&view=blacklist"
     val URL_VIEW_NOTE = prepend("home.php?mod=space&do=notice&view=system")
     private fun prepend(suffix: String): String {
         return BASE_URL + suffix

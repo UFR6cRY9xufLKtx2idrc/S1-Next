@@ -128,7 +128,7 @@ class AppModule {
     fun providerRetrofit(@Data okHttpClient: OkHttpClient, mapper: ObjectMapper): S1Service {
         return Retrofit.Builder()
             .client(okHttpClient)
-            .baseUrl(Api.BASE_API_URL)
+            .baseUrl(Api.BASE_URL)
             .addConverterFactory(RawJsonConverterFactory.create())
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(JacksonConverterFactory.create(mapper))

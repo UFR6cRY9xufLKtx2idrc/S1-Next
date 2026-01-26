@@ -1,11 +1,13 @@
 package me.ykrank.s1next.data.api.model
 
+import android.os.Parcelable
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.ykrank.androidtools.util.L
+import kotlinx.parcelize.Parcelize
 import org.jsoup.Jsoup
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -13,8 +15,9 @@ import java.util.Locale
 /**
  * Created by ykrank on 2017/1/8.
  */
+@Parcelize
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Profile : Account {
+class Profile() : Account(), Parcelable {
 
     var homeUsername: String? = null
     var homeUid: String? = null
@@ -28,17 +31,64 @@ class Profile : Account {
     var lastVisitDate: Long? = null
     var lastActiveDate: Long? = null
     var lastPostDate: Long? = null
+
     @JsonIgnore
     var stats: List<Pair<String, String>> = listOf()
+
     @JsonIgnore
     var manager: List<String>? = null
     val managerString: String?
         get() = manager.toString()
 
-    constructor()
+    val goose: String?
+        get() =
+            stats.firstOrNull { it.first == "战斗力" }?.second
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+
+        if (other !is Profile) return false
+
+        if (uid != other.uid) return false
+        if (homeUsername != other.homeUsername) return false
+        if (homeUid != other.homeUid) return false
+        if (signHtml != other.signHtml) return false
+        if (friends != other.friends) return false
+        if (replies != other.replies) return false
+        if (threads != other.threads) return false
+        if (groupTitle != other.groupTitle) return false
+        if (onlineHour != other.onlineHour) return false
+        if (regDate != other.regDate) return false
+        if (lastVisitDate != other.lastVisitDate) return false
+        if (lastActiveDate != other.lastActiveDate) return false
+        if (lastPostDate != other.lastPostDate) return false
+        if (stats != other.stats) return false
+        if (manager != other.manager) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = uid?.hashCode() ?: 0
+        result = 31 * result + (homeUsername?.hashCode() ?: 0)
+        result = 31 * result + (homeUid?.hashCode() ?: 0)
+        result = 31 * result + (signHtml?.hashCode() ?: 0)
+        result = 31 * result + friends
+        result = 31 * result + replies
+        result = 31 * result + threads
+        result = 31 * result + (groupTitle?.hashCode() ?: 0)
+        result = 31 * result + onlineHour
+        result = 31 * result + (regDate?.hashCode() ?: 0)
+        result = 31 * result + (lastVisitDate?.hashCode() ?: 0)
+        result = 31 * result + (lastActiveDate?.hashCode() ?: 0)
+        result = 31 * result + (lastPostDate?.hashCode() ?: 0)
+        result = 31 * result + stats.hashCode()
+        result = 31 * result + (manager?.hashCode() ?: 0)
+        return result
+    }
 
     @JsonCreator
-    constructor(@JsonProperty("extcredits") extCredits: JsonNode, @JsonProperty("space") space: JsonNode) {
+    constructor(@JsonProperty("extcredits") extCredits: JsonNode, @JsonProperty("space") space: JsonNode) : this() {
         this.homeUsername = space.get("username")?.asText()
         this.homeUid = space.get("uid")?.asText()
         this.signHtml = space.get("sightml")?.asText()
@@ -55,6 +105,7 @@ class Profile : Account {
     }
 
     companion object {
+
         //2018-4-14 22:20
         val df = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA)
 
@@ -85,6 +136,7 @@ class Profile : Account {
                         "管理以下版块" -> {
                             profile.manager = ele.select("a").mapNotNull { it.text() }
                         }
+
                         "活跃概况" -> {
                             profile.groupTitle = ele.child(1).selectFirst("span")?.text()
                             //<ul id="pbbs" class="pf_l">
@@ -94,27 +146,27 @@ class Profile : Account {
                                     "在线时间" -> profile.onlineHour =
                                         element.textNodes()[0].text().trim().let {
                                             it.substring(0, it.length - 3)
-                                    }.toInt()
+                                        }.toInt()
 
                                     "注册时间" -> profile.regDate =
                                         element.textNodes()[0].text().trim().let {
                                             df.parse(it)?.time?.div(1000)
-                                    }
+                                        }
 
                                     "最后访问" -> profile.lastVisitDate =
                                         element.textNodes()[0].text().trim().let {
                                             df.parse(it)?.time?.div(1000)
-                                    }
+                                        }
 
                                     "上次活动时间" -> profile.lastActiveDate =
                                         element.textNodes()[0].text().trim().let {
                                             df.parse(it)?.time?.div(1000)
-                                    }
+                                        }
 
                                     "上次发表时间" -> profile.lastPostDate =
                                         element.textNodes()[0].text().trim().let {
                                             df.parse(it)?.time?.div(1000)
-                                    }
+                                        }
                                 }
                             }
                         }

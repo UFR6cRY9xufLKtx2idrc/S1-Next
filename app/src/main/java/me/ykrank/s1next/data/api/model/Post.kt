@@ -28,8 +28,10 @@ class Post : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
 
     @JsonProperty("pid")
     var id: Int = 0
+
     @JsonProperty("author")
     var authorName: String? = null
+
     @JsonProperty("authorid")
     var authorId: String? = null
 
@@ -38,10 +40,13 @@ class Post : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
 
     @JsonProperty("_isFirst")
     var isFirst: Boolean = false
+
     @JsonProperty("number")
     var number: String? = null
+
     @JsonProperty("dbdateline")
     var dateTime: Long = 0
+
     @JsonProperty("groupid")
     var groupId: Int = 0
 
@@ -50,6 +55,7 @@ class Post : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
      */
     @JsonProperty("_attachment")
     var attachmentMap = mutableMapOf<Int, PostAttachment>()
+
     /**
      * is in blacklist
      */
@@ -71,22 +77,30 @@ class Post : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
 
     @JsonProperty("_banned")
     var banned: Boolean = false
+
     /**
      * Null if no rates, empty if not init.
      */
     @JsonProperty("_rates")
     var rates: List<Rate>? = null
+
     /**
      * whether the author of this post is Original Poster
      */
     @JsonProperty("_isOp")
     var isOpPost: Boolean = false
 
+    @JsonProperty("_profile")
+    var profile: Profile? = null
+
+
     constructor()
 
     @JsonCreator
-    constructor(@JsonProperty("first") first: String?, @JsonProperty("message") reply: String?,
-                @JsonProperty("attachments") attachments: JsonNode?) {
+    constructor(
+        @JsonProperty("first") first: String?, @JsonProperty("message") reply: String?,
+        @JsonProperty("attachments") attachments: JsonNode?
+    ) {
         //if "attachments" is empty, it's array, but map if not empty
         this.isFirst = "1" == first
         var tReply = filterReply(reply)
@@ -195,6 +209,7 @@ class Post : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
         if (banned != other.banned) return false
         if (rates != other.rates) return false
         if (isOpPost != other.isOpPost) return false
+        if (profile != other.profile) return false
 
         return true
     }
@@ -217,6 +232,7 @@ class Post : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
         result = 31 * result + banned.hashCode()
         result = 31 * result + (rates?.hashCode() ?: 0)
         result = 31 * result + isOpPost.hashCode()
+        result = 31 * result + (profile?.hashCode() ?: 0)
         return result
     }
 
@@ -229,7 +245,8 @@ class Post : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
         const val HIDE_WORD = 2
 
         private val TAG = Post::class.java.simpleName
-        private val COLOR_NAME_MAP: androidx.collection.SimpleArrayMap<String, String> = androidx.collection.SimpleArrayMap()
+        private val COLOR_NAME_MAP: androidx.collection.SimpleArrayMap<String, String> =
+            androidx.collection.SimpleArrayMap()
 
         init {
 

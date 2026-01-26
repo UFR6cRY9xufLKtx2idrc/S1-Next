@@ -195,10 +195,10 @@ interface S1Service {
     fun getProfile(@Query("uid") uid: String?): Single<BaseDataWrapper<Profile>>
 
     @GET(ApiHome.URL_PROFILE_WEB)
-    fun getProfileWeb(
+    suspend fun getProfileWeb(
         @Header("Referer") referer: String?,
         @Query("uid") uid: String?
-    ): Single<String>
+    ): String
 
     @GET(ApiHome.URL_FRIENDS)
     fun getFriends(@Query("uid") uid: String?): Single<BaseDataWrapper<Friends>>

@@ -358,4 +358,25 @@ object TextViewBindingAdapter {
             textView.text = history.title
         }
     }
+
+    @JvmStatic
+    @BindingAdapter("goose")
+    fun setGoose(textView: TextView, goose: String?) {
+        if (goose.isNullOrEmpty()) {
+            textView.setTextColor(textView.textColors)
+            return
+        }
+
+        when {
+            // 负鹅标红
+            goose.startsWith("-") -> {
+                textView.setTextColor(Color.RED)
+            }
+
+            // 正鹅默认颜色
+            else -> {
+                textView.setTextColor(ResourceUtil.getTextColorPrimary(textView.context))
+            }
+        }
+    }
 }

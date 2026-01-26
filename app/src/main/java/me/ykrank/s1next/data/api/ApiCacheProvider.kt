@@ -3,6 +3,7 @@ package me.ykrank.s1next.data.api
 import com.github.ykrank.androidtools.data.CacheParam
 import com.github.ykrank.androidtools.data.Resource
 import kotlinx.coroutines.flow.Flow
+import me.ykrank.s1next.data.api.model.Profile
 import me.ykrank.s1next.data.api.model.Rate
 import me.ykrank.s1next.data.api.model.wrapper.ForumGroupsWrapper
 import me.ykrank.s1next.data.api.model.wrapper.PostsWrapper
@@ -39,6 +40,7 @@ interface ApiCacheProvider {
         authorId: String? = null,
         ignoreCache: Boolean = false,
         onRateUpdate: ((pid: Int, rate: List<Rate>) -> Unit)? = null,
+        onProfileUpdate: ((uid: String, profile: Profile) -> Unit)?= null
     ): Flow<Resource<PostsWrapper>>
 
     /**

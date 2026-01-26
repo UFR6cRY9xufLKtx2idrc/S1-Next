@@ -1,6 +1,7 @@
 package me.ykrank.s1next.view.page.post.adapter
 
 import android.content.Context
+import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -82,6 +83,35 @@ class PostAdapterDelegate(private val fragment: Fragment, context: Context) :
         return SimpleRecycleViewHolder(binding)
     }
 
+    override fun onBindViewHolder(
+        items: MutableList<Any>,
+        position: Int,
+        holder: RecyclerView.ViewHolder,
+        payloads: List<Any>
+    ) {
+
+        val viewHolder = holder as? SimpleRecycleViewHolder<ItemPostBinding>
+        if (viewHolder == null) {
+            super.onBindViewHolder(items, position, holder, payloads)
+            return
+        }
+
+        if (payloads.isEmpty()) {
+            super.onBindViewHolder(items, position, holder, payloads)
+            return
+        }
+        val bundle = payloads[0] as? Bundle
+        if (bundle == null) {
+            super.onBindViewHolder(items, position, holder, payloads)
+            return
+        }
+        if (bundle.containsKey("KEY_GOOSE_UPDATE")) {
+            val newGoose = bundle.getString(KEY_GOOSE_UPDATE)
+            // 只更新 goose 对应的 TextView
+            viewHolder.binding.goose.text = newGoose
+        }
+    }
+
     override fun onBindViewHolderData(
         post: Post,
         position: Int,
@@ -120,7 +150,8 @@ class PostAdapterDelegate(private val fragment: Fragment, context: Context) :
                 } else {
                     fragment.lifecycleScope.launch(L.report) {
                         val newRates =
-                            mApiCache.getPostRates(threadInfo?.id?:"", post.id).data ?: emptyList()
+                            mApiCache.getPostRates(threadInfo?.id ?: "", post.id).data
+                                ?: emptyList()
                         post.rates = newRates
                         val adapter = binding.recycleViewRates.adapter as SimpleRecycleViewAdapter?
                         if (adapter != null) {
@@ -199,6 +230,10 @@ class PostAdapterDelegate(private val fragment: Fragment, context: Context) :
 
     fun setVoteInfo(voteInfo: Vote?) {
         this.voteInfo = voteInfo
+    }
+
+    companion object {
+        const val KEY_GOOSE_UPDATE = "KEY_GOOSE_UPDATE"
     }
 
 }

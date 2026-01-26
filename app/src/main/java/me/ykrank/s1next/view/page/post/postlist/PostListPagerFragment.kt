@@ -45,8 +45,8 @@ import me.ykrank.s1next.view.fragment.BaseRecyclerViewFragment
 import me.ykrank.s1next.view.internal.LoadingViewModelBindingDelegateQuickSidebarImpl
 import me.ykrank.s1next.view.internal.PagerScrollState
 import me.ykrank.s1next.view.page.app.AppPostListActivity
+import me.ykrank.s1next.view.page.post.adapter.PostAdapterDelegate
 import me.ykrank.s1next.view.page.post.adapter.PostListRecyclerViewAdapter
-import me.ykrank.s1next.view.page.post.postlist.PostListPagerFragment.PagerCallback
 import java.util.*
 import javax.inject.Inject
 
@@ -282,15 +282,29 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
         return apiCacheProvider.getPostsWrapper(
             mThreadId ?: "", mPageNum, mAuthorId,
             ignoreCache = isIgnoreCache,
-        ) { pid, rates ->
-            mRecyclerAdapter.dataSet.filterIsInstance<Post>()
-                .forEachIndexed { index, post ->
-                    if (post.id == pid) {
-                        post.rates = rates
-                        mRecyclerAdapter.notifyItemChanged(index)
+            { pid, rates ->
+                mRecyclerAdapter.dataSet.filterIsInstance<Post>()
+                    .forEachIndexed { index, post ->
+                        if (post.id == pid) {
+                            post.rates = rates
+                            mRecyclerAdapter.notifyItemChanged(index)
+                        }
                     }
-                }
-        }
+            },
+            { uid, profile ->
+                mRecyclerAdapter.dataSet.filterIsInstance<Post>()
+                    .forEachIndexed { index, post ->
+                        if (post.authorId == uid) {
+                            post.profile = profile
+                            val payload = Bundle().apply {
+                                putString(PostAdapterDelegate.KEY_GOOSE_UPDATE, profile.goose)
+                            }
+
+                            mRecyclerAdapter.notifyItemChanged(index, payload)
+                        }
+                    }
+            }
+        )
     }
 
     override fun onNextSuccess(resource: Resource.Success<PostsWrapper>) {

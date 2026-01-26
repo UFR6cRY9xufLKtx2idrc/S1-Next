@@ -229,18 +229,22 @@ class UserHomeActivity : BaseActivity() {
 
     private fun loadData() {
         binding.data?.let { profile ->
+            lifecycleScope.launch(L.report) {
+                try {
+                    val profile = withContext(Dispatchers.IO) {
+                        val html = s1Service.getProfileWeb(
+                            "${Api.BASE_URL}space-uid-${profile.homeUid}.html",
+                            profile.homeUid
+                        )
+                        Profile.fromHtml(html)
+                    }
 
-            s1Service.getProfileWeb(
-                "${Api.BASE_URL}space-uid-${profile.homeUid}.html",
-                profile.homeUid
-            )
-                .map { Profile.fromHtml(it) }
-                .compose(RxJavaUtil.iOSingleTransformer())
-                .to(AndroidRxDispose.withSingle(this, ActivityEvent.DESTROY))
-                .subscribe({
-                    binding.data = it
-                    adapter.swapDataSet(it.stats)
-                }, L::e)
+                    binding.data = profile
+                    adapter.swapDataSet(profile.stats)
+                } catch (e: Exception) {
+                    L.e(e)
+                }
+            }
         }
     }
 

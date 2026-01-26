@@ -10,6 +10,8 @@ import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.ApiCacheProvider
 import me.ykrank.s1next.data.api.ApiVersionInterceptor
+import me.ykrank.s1next.data.api.ProfileProvider
+import me.ykrank.s1next.data.api.S1ProfileProvider
 import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.data.api.UserValidator
 import me.ykrank.s1next.data.api.app.AppApi
@@ -152,10 +154,17 @@ class AppModule {
 
     @Provides
     @AppLife
+    fun providerProfileProvider(s1Service: S1Service): ProfileProvider {
+        return S1ProfileProvider(s1Service)
+    }
+
+    @Provides
+    @AppLife
     fun providerApiCacheProvider(
         context: Context,
         downloadPreferencesManager: DownloadPreferencesManager,
         s1Service: S1Service,
+        profileProvider: ProfileProvider,
         cacheBiz: CacheBiz,
         cacheGroupBiz: CacheGroupBiz,
         user: User,
@@ -165,6 +174,7 @@ class AppModule {
         return S1ApiCacheProvider(
             downloadPreferencesManager,
             s1Service,
+            profileProvider,
             cacheBiz,
             cacheGroupBiz,
             user,
@@ -199,7 +209,11 @@ class AppModule {
 
     @Provides
     @AppLife
-    fun provideNoticeCheckTask(eventBus: EventBus, s1Service: S1Service, user: User): NoticeCheckTask {
+    fun provideNoticeCheckTask(
+        eventBus: EventBus,
+        s1Service: S1Service,
+        user: User
+    ): NoticeCheckTask {
         return NoticeCheckTask(eventBus, s1Service, user)
     }
 

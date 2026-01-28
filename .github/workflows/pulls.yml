@@ -41,5 +41,5 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: app/build/outputs/apk/normal/release/app-normal-release.apk
           asset_name: app-normal-release-${{ github.run_number }}.apk
-          tag: ${{ github.ref }}
+          tag: Pulls
           overwrite: true

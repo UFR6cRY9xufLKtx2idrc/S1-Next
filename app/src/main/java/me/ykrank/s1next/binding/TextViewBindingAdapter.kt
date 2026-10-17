@@ -57,7 +57,8 @@ object TextViewBindingAdapter {
             synchronized(lock) {
                 var cache = this[key]
                 if (cache == null) {
-                    cache = androidx.collection.LruCache(64)
+                    // 一页 40 楼 + 相邻页预加载 + 来回翻页，128 基本能覆盖住
+                    cache = androidx.collection.LruCache(128)
                     this[key] = cache
                 }
                 return cache!!
@@ -293,9 +294,12 @@ object TextViewBindingAdapter {
             textView.setBreakStrategy(Layout.BREAK_STRATEGY_SIMPLE)
         }
 
-        // 只缓存纯文本（无 <img>）的 Spanned。
-        // 含图片的 html 每次都得走 GlideImageGetter，跨 ViewHolder 复用会错乱。
+        // 只缓存纯文本（无 <img>、无 <blockquote>）的 Spanned：
+        // - 含 <img> 时 GlideImageGetter 绑定了当前 textView 和 lifecycleOwner，跨 ViewHolder 复用会错乱；
+        // - 含 <blockquote> 时 replaceQuoteSpans 返回的 SpannableString 是可变对象，
+        //   同一份 html 被多个楼层命中缓存时会共享同一个 Spannable，导致 Selection 互相污染。
         val hasImage = html.contains("<img", ignoreCase = true)
+        val hasQuote = html.contains("<blockquote", ignoreCase = true)
         val plainCache = if (!hasImage) plainHtmlSpanCacheMap.getOrCreate(textView.context) else null
         if (plainCache != null) {
             plainCache[html]?.let {

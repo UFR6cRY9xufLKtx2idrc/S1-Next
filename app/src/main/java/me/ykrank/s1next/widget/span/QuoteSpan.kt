@@ -33,19 +33,18 @@ class QuoteSpan(private val stripeColor: Int, private val stripeWidth: Float, pr
 
 fun Spanned.replaceQuoteSpans(context: Context): Spanned {
     val quoteSpans = getSpans(0, length, QuoteSpan::class.java)
-    var spannableString = SpannableString(this)
+    // 没有引用块时直接返回自身，避免每次 bind 都全量复制 Spannable
+    if (quoteSpans.isEmpty()) return this
+
+    val spannableString = SpannableString(this)
+    // color 只取一次，避免循环里反复走 ResourceUtil
+    val color = ResourceUtil.getAttrColorInt(context, androidx.appcompat.R.attr.colorPrimaryDark)
     for (quoteSpan in quoteSpans) {
         val start = getSpanStart(quoteSpan)
         val end = getSpanEnd(quoteSpan)
         val flags = getSpanFlags(quoteSpan)
         spannableString.removeSpan(quoteSpan)
-        spannableString.setSpan(QuoteSpan(
-                ResourceUtil.getAttrColorInt(context, androidx.appcompat.R.attr.colorPrimaryDark),
-                10f,
-                15f),
-                start,
-                end,
-                flags)
+        spannableString.setSpan(QuoteSpan(color, 10f, 15f), start, end, flags)
     }
     return spannableString
 }

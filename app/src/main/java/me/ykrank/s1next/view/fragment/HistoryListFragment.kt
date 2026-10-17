@@ -7,10 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.ykrank.androidtools.util.L
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.ykrank.s1next.R
 import me.ykrank.s1next.data.cache.biz.CacheBiz
 import me.ykrank.s1next.data.db.biz.HistoryBiz
 import me.ykrank.s1next.data.db.biz.ReadProgressBiz
@@ -19,7 +22,6 @@ import me.ykrank.s1next.databinding.FragmentBaseBinding
 import me.ykrank.s1next.view.activity.HistoryActivity
 import me.ykrank.s1next.view.adapter.HistoryCursorRecyclerViewAdapter
 import javax.inject.Inject
-import kotlinx.coroutines.CancellationException
 
 /**
  * Fragment show post view history list

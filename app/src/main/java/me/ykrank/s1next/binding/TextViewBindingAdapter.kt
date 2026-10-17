@@ -283,7 +283,7 @@ object TextViewBindingAdapter {
         if (TextUtils.equals(oHtml, html)) {
             return
         }
-        if (TextUtils.isEmpty(html)) {
+        if (html.isNullOrEmpty()) {
             textView.text = null
             return
         }

@@ -47,6 +47,24 @@ import java.nio.charset.Charset
 object TextViewBindingAdapter {
     private const val defaultTextColor = 0
 
+    // 纯文本楼层（无 <img>）的 Spanned 缓存。
+    // 用 WeakHashMap<Context, ...> 让 Activity 被回收后自动清理，
+    // 避免主题/字体尺寸变化时残留旧颜色。
+    private val plainHtmlSpanCacheMap = object : java.util.WeakHashMap<Context, androidx.collection.LruCache<String, Spanned>>() {
+        private val lock = Any()
+
+        fun getOrCreate(key: Context): androidx.collection.LruCache<String, Spanned> {
+            synchronized(lock) {
+                var cache = this[key]
+                if (cache == null) {
+                    cache = androidx.collection.LruCache(64)
+                    this[key] = cache
+                }
+                return cache!!
+            }
+        }
+    }
+
     @JvmStatic
     fun increaseClickingArea(textView: TextView, size: Float) {
         // fork from http://stackoverflow.com/a/1343796
@@ -267,20 +285,33 @@ object TextViewBindingAdapter {
         }
         if (TextUtils.isEmpty(html)) {
             textView.text = null
+            return
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            textView.setBreakStrategy(LineBreaker.BREAK_STRATEGY_SIMPLE)
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                textView.setBreakStrategy(LineBreaker.BREAK_STRATEGY_SIMPLE)
-            } else {
-                textView.setBreakStrategy(Layout.BREAK_STRATEGY_SIMPLE)
+            textView.setBreakStrategy(Layout.BREAK_STRATEGY_SIMPLE)
+        }
+
+        // 只缓存纯文本（无 <img>）的 Spanned。
+        // 含图片的 html 每次都得走 GlideImageGetter，跨 ViewHolder 复用会错乱。
+        val hasImage = html.contains("<img", ignoreCase = true)
+        val plainCache = if (!hasImage) plainHtmlSpanCacheMap.getOrCreate(textView.context) else null
+        if (plainCache != null) {
+            plainCache[html]?.let {
+                textView.text = it
+                return
             }
-            lifecycleOwner.lifecycleScope.launch {
-                val glideImageGetter = GlideImageGetter[textView, lifecycleOwner]
-                val span = withContext(Dispatchers.Default) {
-                    HtmlCompat.fromHtml(html, glideImageGetter, TagHandler(textView))
-                        .replaceQuoteSpans(textView.context)
-                }
-                textView.text = span
+        }
+
+        lifecycleOwner.lifecycleScope.launch {
+            val glideImageGetter = GlideImageGetter[textView, lifecycleOwner]
+            val span = withContext(Dispatchers.Default) {
+                HtmlCompat.fromHtml(html, glideImageGetter, TagHandler(textView))
+                    .replaceQuoteSpans(textView.context)
             }
+            plainCache?.put(html, span)
+            textView.text = span
         }
     }
 

@@ -41,7 +41,7 @@ transition = "1.7.0"
 subsamplingimageview = "3.10.0"
 compileSdk = "37"
 targetSdk = "34"
-agp = "9.3.3"
+agp = "9.2.1"
 
 [libraries]
 alicloud-android-httpdns = { module = "com.aliyun.ams:alicloud-android-httpdns", version.ref = "alicloudAndroidHttpdns" }

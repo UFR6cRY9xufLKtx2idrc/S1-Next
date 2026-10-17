@@ -18,6 +18,16 @@ class ThreadBiz(private val manager: AppDatabaseManager) {
         return threadDao.getByThreadId(threadId)
     }
 
+    /**
+     * 批量查询 DbThread，用于列表场景避免 N+1 查询。
+     * 返回 threadId -> DbThread 的 Map，方便调用方 O(1) 命中。
+     */
+    @WorkerThread
+    fun getWithThreadIds(threadIds: List<Int>): Map<Int, DbThread> {
+        if (threadIds.isEmpty()) return emptyMap()
+        return threadDao.getByThreadIds(threadIds).associateBy { it.threadId }
+    }
+
     @WorkerThread
     fun saveThread(dbThread: DbThread) {
         val oDbThread = getWithThreadId(dbThread.threadId)

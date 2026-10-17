@@ -64,7 +64,6 @@ android {
     }
     buildTypes {
         debug {
-            multiDexEnabled = true
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
             if (signingConfigs.findByName("release") != null) {
@@ -73,7 +72,6 @@ android {
         }
 
         create("alpha") {
-            multiDexEnabled = true
             applicationIdSuffix = ".alpha"
             versionNameSuffix = "-alpha"
             if (signingConfigs.findByName("release") != null) {
@@ -87,13 +85,14 @@ android {
         }
 
         release {
-            multiDexEnabled = true
-            if (signingConfigs.findByName("release") != null) {
-                signingConfig = signingConfigs.getByName("release")
-            }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            val releaseSig = signingConfigs.findByName("release")
+            signingConfig = if (releaseSig != null) releaseSig else {
+                println("use debug signing config")
+                signingConfigs["debug"]
+            }
         }
     }
 
@@ -105,11 +104,6 @@ android {
 
     flavorDimensions += "market"
     productFlavors {
-        create("play") {
-            dimension = "market"
-            manifestPlaceholders["APP_CHANNEL"] = "play.google.com"
-            versionNameSuffix = "-play"
-        }
         create("normal") {
             dimension = "market"
             manifestPlaceholders["APP_CHANNEL"] = "normal"

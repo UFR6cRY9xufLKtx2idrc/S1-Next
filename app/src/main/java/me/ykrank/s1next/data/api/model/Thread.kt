@@ -38,7 +38,7 @@ class Thread @JsonCreator constructor(
     @JsonProperty("author")
     var author: String? = null,
 
-    @JsonProperty("authorId")
+    @JsonProperty("authorid")
     var authorId: Int = 0,
 
     @JsonProperty("displayorder")

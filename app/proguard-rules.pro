@@ -17,3 +17,12 @@
 -keep public class me.ykrank.s1next.data.db.dbmodel.** { *; }
 -keep public class me.ykrank.s1next.data.cache.dbmodel.Cache { *; }
 
+# Jackson 依赖的注解和泛型签名，R8 full mode 曾导致裁剪
+-keepattributes *Annotation*
+-keepattributes Signature
+-keepattributes RuntimeVisibleAnnotations
+-keepattributes RuntimeVisibleParameterAnnotations
+
+# Room 反射查找的 _Impl 类（历史记录崩溃的防御性兜底）
+-keep class me.ykrank.s1next.data.db.AppDatabase_Impl { *; }
+-keep class me.ykrank.s1next.data.cache.CacheDatabase_Impl { *; }

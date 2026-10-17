@@ -1,0 +1,46 @@
+name: Pull requests
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          check-latest: true
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Build with Gradle
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Uploading Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: app-normal-release.apk
+          path: ./app/build/outputs/apk/normal/release/app-normal-release.apk
+          if-no-files-found: error
+
+#      - name: Upload binaries to release
+#        if: github.event.pull_request.head.repo.full_name == github.repository
+#        uses: svenstaro/upload-release-action@v2
+#        with:
+#          repo_token: ${{ secrets.GITHUB_TOKEN }}
+#          file: app/build/outputs/apk/normal/release/app-normal-release.apk
+#          asset_name: app-normal-release-${{ github.run_number }}.apk
+#          tag: Pulls
+#          overwrite: true

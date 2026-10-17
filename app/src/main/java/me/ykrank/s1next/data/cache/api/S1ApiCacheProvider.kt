@@ -295,32 +295,29 @@ class S1ApiCacheProvider(
                                 if (posts != null) {
                                     withContext(Dispatchers.IO) {
                                         posts.filter {
-                                            it.rates?.size == 0 || outdatedRatePostIds.contains(
-                                                it.id
-                                            )
+                                            it.rates?.size == 0 || outdatedRatePostIds.contains(it.id)
                                         }
                                             .distinctBy { it.id }
                                             .asFlow()
-                                            .map {
-                                                val pid = it.id
-                                                val rates = loadTime.run("get_rate_${pid}") {
-                                                    getPostRates(
-                                                        threadId,
-                                                        pid
-                                                    ).data
-                                                }
-
-                                                // 最新数据和缓存不同时，才刷新
-                                                if (rates != null && it.rates != rates) {
-                                                    it.rates = rates
-                                                    launch(Dispatchers.Main) {
-                                                        onRateUpdate(pid, rates)
+                                            // 用 flatMapMerge 并发拉取评分，把 N 次串行 HTTP 压到 concurrency 路并发
+                                            .flatMapMerge(RATE_LOAD_CONCURRENCY) { post ->
+                                                flow {
+                                                    val pid = post.id
+                                                    val rates = loadTime.run("get_rate_${pid}") {
+                                                        getPostRates(threadId, pid).data
                                                     }
-                                                    pid
-                                                } else {
-                                                    null
+                                                    if (rates != null && post.rates != rates) {
+                                                        post.rates = rates
+                                                        launch(Dispatchers.Main) {
+                                                            onRateUpdate(pid, rates)
+                                                        }
+                                                        emit(pid)
+                                                    } else {
+                                                        emit(null)
+                                                    }
                                                 }
-                                            }.debounce(CACHE_RATE_SAVE_DEBOUNCE)
+                                            }
+                                            .debounce(CACHE_RATE_SAVE_DEBOUNCE)
                                             .collect {
                                                 if (cacheValid && it != null) {
                                                     withContext(Dispatchers.Default) {
@@ -407,5 +404,8 @@ class S1ApiCacheProvider(
         const val TAG = "S1ApiCache"
         const val CACHE_RATE_MILLS = 30_000L
         const val CACHE_RATE_SAVE_DEBOUNCE = 1_000L
+        // 评分并发数。4 足够把典型 1~3 秒压到 1 秒以内，
+        // 又不会给 S1 服务器压力过大
+        const val RATE_LOAD_CONCURRENCY = 4
     }
 }

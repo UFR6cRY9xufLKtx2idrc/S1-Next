@@ -13,6 +13,7 @@ import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.api.model.ThreadType
 import me.ykrank.s1next.data.db.biz.bizDependencies
 import me.ykrank.s1next.data.db.dbmodel.BlackList
+import me.ykrank.s1next.data.db.dbmodel.DbThread
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class Threads @JsonCreator constructor(
@@ -64,8 +65,11 @@ class Threads @JsonCreator constructor(
         fun getFilterThreadList(oThreads: List<Thread>?): MutableList<Thread> {
             val threads = ArrayList<Thread>()
             if (oThreads != null) {
+                // 一次性批量查出所有 DbThread，避免每楼一次 SQLite 查询（N+1）
+                val threadIds = oThreads.mapNotNull { it.id?.toIntOrNull() }.distinct()
+                val dbThreadMap = bizDependencies().threadBiz.getWithThreadIds(threadIds)
                 for (thread in oThreads) {
-                    val fThread = getFilterThread(thread, false)
+                    val fThread = getFilterThread(thread, false, dbThreadMap)
                     if (fThread != null) {
                         threads.add(fThread)
                     }
@@ -80,8 +84,15 @@ class Threads @JsonCreator constructor(
          *  * 获取上次访问时回复数
          *
          * 如果修改了过滤状态，则会返回不同的对象
+         *
+         * @param dbThreadMap 可选。列表场景由 [getFilterThreadList] 预取批量结果传入，
+         *                    传 null 时退化为单条查询，兼容其它单次调用方。
          */
-        fun getFilterThread(oThread: Thread, copyed: Boolean = false): Thread? {
+        fun getFilterThread(
+            oThread: Thread,
+            copyed: Boolean = false,
+            dbThreadMap: Map<Int, DbThread>? = null,
+        ): Thread? {
             LooperUtil.enforceOnWorkThread()
             var nThread: Thread = oThread
             val dependencies = bizDependencies()
@@ -107,8 +118,10 @@ class Threads @JsonCreator constructor(
                 }
             }
 
-            val dbThread = dependencies.threadBiz.getWithThreadId(nThread.id?.toInt()
-                    ?: 0)
+            val threadId = nThread.id?.toIntOrNull() ?: 0
+            // 优先命中预取的批量结果；没有则退化为单条查询
+            val dbThread = dbThreadMap?.get(threadId)
+                ?: dependencies.threadBiz.getWithThreadId(threadId)
             if (dbThread != null) {
                 nThread.lastReplyCount = dbThread.lastCountWhenView
             }

@@ -16,6 +16,9 @@ interface ThreadDao {
     @Query("SELECT * FROM DbThread WHERE ThreadId == :threadId LIMIT 1")
     fun getByThreadId(threadId: Int): DbThread?
 
+    @Query("SELECT * FROM DbThread WHERE ThreadId IN (:threadIds)")
+    fun getByThreadIds(threadIds: List<Int>): List<DbThread>
+
     @Insert
     fun insert(thread: DbThread)
 

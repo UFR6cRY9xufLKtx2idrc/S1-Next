@@ -19,6 +19,7 @@ import me.ykrank.s1next.databinding.FragmentBaseBinding
 import me.ykrank.s1next.view.activity.HistoryActivity
 import me.ykrank.s1next.view.adapter.HistoryCursorRecyclerViewAdapter
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 
 /**
  * Fragment show post view history list
@@ -84,15 +85,22 @@ class HistoryListFragment : BaseFragment() {
 
     private fun load() {
         val currentQuery = query.trim()
-        lifecycleScope.launch {
-            val cursor = withContext(Dispatchers.IO) {
-                if (mode == HistoryActivity.MODE_POST_BACKUP) {
-                    cacheBiz.getPostBackupThreadsCursor(currentQuery)
-                } else {
-                    historyBiz.getHistoryListCursor(currentQuery)
+        lifecycleScope.launch(L.report) {
+            try {
+                val cursor = withContext(Dispatchers.IO) {
+                    if (mode == HistoryActivity.MODE_POST_BACKUP) {
+                        cacheBiz.getPostBackupThreadsCursor(currentQuery)
+                    } else {
+                        historyBiz.getHistoryListCursor(currentQuery)
+                    }
                 }
+                mRecyclerAdapter?.changeCursor(cursor)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                L.report(e)
+                showSnackbar(getString(R.string.message_load_error))
             }
-            mRecyclerAdapter?.changeCursor(cursor)
         }
     }
 

@@ -150,10 +150,23 @@ class PostRenderMapper {
         if (html.isBlank()) {
             return true
         }
-        val body = Jsoup.parseBodyFragment(html).body()
-        body.select("br").remove()
-        val text = body.text().replace('\u00A0', ' ')
-        return text.isBlank() && body.select(MEDIA_TAGS_SELECTOR).isEmpty()
+        // 含媒体标签就不算 blank，无需再走 Jsoup.parseBodyFragment
+        if (html.contains("<img", ignoreCase = true) ||
+            html.contains("<video", ignoreCase = true) ||
+            html.contains("<iframe", ignoreCase = true) ||
+            html.contains("<object", ignoreCase = true) ||
+            html.contains("<embed", ignoreCase = true)
+        ) {
+            return false
+        }
+        // 去掉标签和空白实体后，看是否还有可见字符
+        val stripped = html
+            .replace("<[^>]*>".toRegex(), "")
+            .replace("&nbsp;", " ")
+            .replace("&#160;", " ")
+            .replace('\u00A0', ' ')
+            .trim()
+        return stripped.isEmpty()
     }
 
     private fun normalizeImageUrl(src: String?): String? {
